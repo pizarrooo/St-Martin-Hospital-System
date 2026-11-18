@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import type { BotOption } from '~/utils/chatbot'
+
 interface Message {
   from: 'bot' | 'user'
   text: string
+  options?: BotOption[]
 }
 
 const open = ref(false)
 const input = ref('')
 const listEl = ref<HTMLElement | null>(null)
-const messages = ref<Message[]>([])
+const messages = ref<Message[]>([{ from: 'bot', ...getBotReply('cmd:menu') }])
 
 function scrollDown() {
   nextTick(() => {
@@ -15,17 +18,18 @@ function scrollDown() {
   })
 }
 
-// Temporary: replaced by the rule-based assistant in Commit 5
-function send(text: string) {
-  const clean = text.trim()
-  if (!clean) return
-  messages.value.push({ from: 'user', text: clean })
-  messages.value.push({
-    from: 'bot',
-    text: 'Thanks! My answers are still being set up and will be available soon.',
-  })
-  input.value = ''
+// label = what the patient sees, query = what the assistant reads
+function ask(label: string, query: string) {
+  messages.value.push({ from: 'user', text: label })
+  messages.value.push({ from: 'bot', ...getBotReply(query) })
   scrollDown()
+}
+
+function sendTyped() {
+  const text = input.value.trim()
+  if (!text) return
+  input.value = ''
+  ask(text, text)
 }
 </script>
 
@@ -34,7 +38,7 @@ function send(text: string) {
     <!-- Chat panel -->
     <div
       v-show="open"
-      class="fixed bottom-24 left-4 z-50 flex max-h-[70vh] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-2xl"
+      class="fixed bottom-24 left-4 z-50 flex max-h-[75vh] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-2xl"
     >
       <div class="flex items-center justify-between bg-primary px-4 py-3 text-primary-content">
         <div>
@@ -45,51 +49,51 @@ function send(text: string) {
       </div>
 
       <div ref="listEl" class="flex-1 space-y-3 overflow-y-auto bg-base-200 p-4">
-        <!-- Welcome message with the two choices -->
-        <div class="max-w-[85%] rounded-box rounded-tl-none bg-base-100 p-3 text-sm shadow-sm">
-          <p>Hello! 👋 How can I assist you? You can:</p>
-          <div class="mt-3 flex flex-col gap-2">
-            <button class="btn btn-outline btn-primary btn-sm justify-start" @click="send('Book an Appointment')">
-              📅 Book an Appointment
-            </button>
-            <button class="btn btn-outline btn-primary btn-sm justify-start" @click="send('Learn About Services')">
-              🩺 Learn About Services
-            </button>
+        <template v-for="(msg, i) in messages" :key="i">
+          <div class="flex" :class="msg.from === 'user' ? 'justify-end' : 'justify-start'">
+            <div
+              class="max-w-[90%] whitespace-pre-line rounded-box p-3 text-sm"
+              :class="
+                msg.from === 'user'
+                  ? 'rounded-tr-none bg-primary text-primary-content'
+                  : 'rounded-tl-none bg-base-100 shadow-sm'
+              "
+            >
+              {{ msg.text }}
+            </div>
           </div>
-          <p class="mt-3 text-[11px] text-base-content/60">
-            I'm an automated assistant. I can't give medical advice or diagnose. Transactions are
-            completed at the hospital.
-          </p>
-        </div>
 
-        <div
-          v-for="(msg, i) in messages"
-          :key="i"
-          class="flex"
-          :class="msg.from === 'user' ? 'justify-end' : 'justify-start'"
-        >
+          <!-- Quick replies, only under the latest bot message -->
           <div
-            class="max-w-[85%] rounded-box p-3 text-sm"
-            :class="
-              msg.from === 'user'
-                ? 'rounded-tr-none bg-primary text-primary-content'
-                : 'rounded-tl-none bg-base-100 shadow-sm'
-            "
+            v-if="msg.options && i === messages.length - 1"
+            class="flex flex-wrap gap-2"
           >
-            {{ msg.text }}
+            <button
+              v-for="opt in msg.options"
+              :key="opt.command"
+              class="btn btn-outline btn-primary btn-sm h-auto min-h-8 whitespace-normal py-1 text-left"
+              @click="ask(opt.label, opt.command)"
+            >
+              {{ opt.label }}
+            </button>
           </div>
-        </div>
+        </template>
       </div>
 
-      <div class="flex gap-2 border-t border-base-300 bg-base-100 p-3">
-        <input
-          v-model="input"
-          type="text"
-          placeholder="Type a message..."
-          class="input input-bordered input-sm flex-1"
-          @keyup.enter="send(input)"
-        />
-        <button class="btn btn-primary btn-sm text-white" aria-label="Send" @click="send(input)">➤</button>
+      <div class="border-t border-base-300 bg-base-100 p-3">
+        <div class="flex gap-2">
+          <input
+            v-model="input"
+            type="text"
+            placeholder="Type a message..."
+            class="input input-bordered input-sm flex-1"
+            @keyup.enter="sendTyped"
+          />
+          <button class="btn btn-primary btn-sm text-white" aria-label="Send" @click="sendTyped">➤</button>
+        </div>
+        <p class="mt-2 text-[11px] text-base-content/60">
+          Automated assistant. It does not give medical advice or diagnose.
+        </p>
       </div>
     </div>
 

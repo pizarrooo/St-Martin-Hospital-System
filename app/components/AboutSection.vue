@@ -38,7 +38,7 @@
       <div class="mt-10 text-center">
         <h3 class="text-lg font-semibold text-base-content/80">Accredited HMOs</h3>
         <div class="mt-4 flex flex-wrap justify-center gap-2">
-          <span v-for="hmo in hospitalHmos" :key="hmo" class="badge badge-outline badge-primary p-3">
+          <span v-for="hmo in hospitalHmos" :key="hmo" class="rounded-full border border-primary/40 px-3 py-1 text-sm text-primary">
             {{ hmo }}
           </span>
         </div>

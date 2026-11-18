@@ -3,7 +3,7 @@
     <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
       <!-- Text -->
       <div>
-        <span class="badge badge-outline badge-primary mb-4">
+        <span class="mb-4 inline-block rounded-full border border-primary/40 px-3 py-1 text-xs font-medium text-primary">
           OPD open 6:00 AM – 5:00 PM · Hospital open 24/7
         </span>
         <h1 class="text-4xl font-bold leading-tight text-primary md:text-5xl">
