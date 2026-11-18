@@ -1,5 +1,20 @@
 <script setup lang="ts">
-// hospitalServices is auto-imported from app/utils/hospitalData.ts
+const doctorFilter = useState<string>('doctorFilter', () => 'all')
+
+const groups = [
+  { title: 'Specialty Clinics', items: hospitalServices.filter((s) => s.type === 'clinic') },
+  { title: 'Diagnostic & Support Services', items: hospitalServices.filter((s) => s.type === 'support') },
+]
+
+function doctorLabel(serviceId: string) {
+  const n = doctorsForService(serviceId).length
+  if (n === 0) return 'Schedule to be announced'
+  return `${n} doctor${n > 1 ? 's' : ''}`
+}
+
+function pickService(service: { id: string; type: string }) {
+  if (service.type === 'clinic') doctorFilter.value = service.id
+}
 </script>
 
 <template>
@@ -12,21 +27,30 @@
         </p>
       </div>
 
-      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <a
-          v-for="service in hospitalServices"
-          :key="service.id"
-          href="#book"
-          class="card border border-base-300 bg-base-100 transition hover:border-primary hover:shadow-md"
-        >
-          <div class="card-body items-center text-center">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-base-200 text-3xl">
-              {{ service.icon }}
+      <div v-for="group in groups" :key="group.title" class="mt-10">
+        <h3 class="mb-4 text-lg font-semibold text-base-content/80">{{ group.title }}</h3>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <component
+            :is="service.type === 'clinic' ? 'a' : 'div'"
+            v-for="service in group.items"
+            :key="service.id"
+            :href="service.type === 'clinic' ? '#doctors' : undefined"
+            class="card border border-base-300 bg-base-100 transition"
+            :class="service.type === 'clinic' ? 'hover:border-primary hover:shadow-md' : ''"
+            @click="pickService(service)"
+          >
+            <div class="card-body items-center text-center">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-base-200 text-3xl">
+                {{ service.icon }}
+              </div>
+              <h4 class="card-title text-base text-primary">{{ service.name }}</h4>
+              <p class="text-sm text-base-content/70">{{ service.description }}</p>
+              <p v-if="service.type === 'clinic'" class="text-xs font-medium text-primary">
+                {{ doctorLabel(service.id) }}
+              </p>
             </div>
-            <h3 class="card-title text-base text-primary">{{ service.name }}</h3>
-            <p class="text-sm text-base-content/70">{{ service.description }}</p>
-          </div>
-        </a>
+          </component>
+        </div>
       </div>
     </div>
   </section>
