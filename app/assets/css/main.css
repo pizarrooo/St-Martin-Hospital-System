@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: stmartin --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "stmartin";
+  default: true;
+  color-scheme: light;
+  --color-primary: #2f4f93;
+  --color-primary-content: #ffffff;
+  --color-secondary: #5b7fc7;
+  --color-secondary-content: #ffffff;
+  --color-accent: #3fb68b;
+  --color-accent-content: #ffffff;
+  --color-base-100: #ffffff;
+  --color-base-200: #f1f5fc;
+  --color-base-300: #dfe7f5;
+  --color-base-content: #1c2a4a;
+  --color-success: #3fb68b;
+  --color-warning: #f2a93b;
+  --color-error: #e05a5a;
+  --radius-box: 0.75rem;
+  --radius-field: 0.5rem;
+}
