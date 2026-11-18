@@ -24,3 +24,8 @@
   --radius-box: 0.75rem;
   --radius-field: 0.5rem;
 }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}

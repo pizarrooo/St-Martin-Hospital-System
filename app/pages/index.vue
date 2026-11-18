@@ -1,13 +1,25 @@
+<script setup lang="ts">
+const placeholders = [
+  { id: 'services', label: 'Our Services' },
+  { id: 'doctors', label: 'Our Doctors' },
+  { id: 'about', label: 'About the Hospital' },
+  { id: 'contact', label: 'Contact Us' },
+]
+</script>
+
 <template>
-  <main class="min-h-screen bg-base-200 flex items-center justify-center p-6">
-    <div class="text-center">
-      <h1 class="text-4xl font-bold text-primary">
-        St. Martin Maternity and Pediatric Hospital
-      </h1>
-      <p class="mt-3 text-base-content/70">
-        Web-Based Appointment and Service Availability System
-      </p>
-      <button class="btn btn-primary mt-6">Book Appointment</button>
-    </div>
-  </main>
+  <div>
+    <AppNavbar />
+    <HeroSection />
+
+    <!-- Temporary placeholders (replaced in Commit 3 and later) -->
+    <section
+      v-for="s in placeholders"
+      :id="s.id"
+      :key="s.id"
+      class="flex min-h-[50vh] items-center justify-center border-t border-base-300"
+    >
+      <h2 class="text-2xl font-semibold text-primary/60">{{ s.label }} (coming soon)</h2>
+    </section>
+  </div>
 </template>
